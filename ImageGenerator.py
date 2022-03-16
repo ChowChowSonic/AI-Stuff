@@ -3,7 +3,7 @@ import os
 import tensorflow as tf
 import shutil
 from PIL import Image
-from autoEncoder import ImageEncoder as Encoder
+from autoEncoder import VarEncoder as Encoder
 
 #Take all images in the dataset and move them to a single folder
 '''for root, dirs, files in os.walk("dogs", topdown=False):
@@ -68,14 +68,14 @@ def load_data(n = 0, directory = "dogs", size = (375,500,3), grayscale = False):
     print("Data Loaded:", len(data), "images prepared.")
     return data
 
-epochs = 50
+epochs = 100
 dir="pokemon\\all"
 data = load_data(directory=dir, size=(120,120,4), grayscale=True)
 encoder = Encoder([120,120,1], 
-        conv_filters=(16,8,4),
+        conv_filters=(4,4,2),
         conv_kernels=(3,3,3),
         conv_strides=(1,2,1),
-        latent_space_dim=2)
+        latent_space_dim=1024)
 encoder.compile(0.0001)
 encoder.train(data, 32, epochs)
 name = dir.replace("\\", ".")+str(len(data))+"_"+str(len(encoder.conv_filters))+"cv_"+str(encoder.conv_kernels[0])+"k_"+str(encoder.latent_space_dim)+"d"
@@ -87,17 +87,17 @@ imgs, latent = encoder.reconstruct(data[0:6])
 imgs = np.asarray(imgs*256, dtype=np.uint8)
 imgs = np.pad(imgs, pad_width=((0,0),(0,0),(0,0),(0,2)), mode="minimum")
 
-randomlatent = np.random.randint(low=0, high=40, size=[6,1024])
-imgs = encoder.generatefromLatentReps(randomlatent)
-imgs = np.asarray(imgs*256, dtype=np.uint8)
-imgs = np.pad(imgs, pad_width=((0,0),(0,0),(0,0),(0,2)), mode="minimum")
+#randomlatent = np.random.randint(low=0, high=40, size=[6,1024])
+#imgs = encoder.generatefromLatentReps(randomlatent)
+#imgs = np.asarray(imgs*256, dtype=np.uint8)
+#imgs = np.pad(imgs, pad_width=((0,0),(0,0),(0,0),(0,2)), mode="minimum")
 
 for i in range(len(imgs)):
     im = Image.fromarray(imgs[i])
     im.save("Generated/"+name+" ("+str(i)+").jpg")
 
-'''data = np.pad(data, pad_width=((0,0),(0,0),(0,0),(0,2)), mode="minimum")
+data = np.pad(data, pad_width=((0,0),(0,0),(0,0),(0,2)), mode="minimum")
 data = data.astype(np.uint8)
 for i in range(len(imgs)):
     im = Image.fromarray(data[i])
-    im.save("Generated/"+"original ("+str(i)+").jpg")'''
+    im.save("Generated/"+"original ("+str(i)+").jpg")
