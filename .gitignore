@@ -8,3 +8,5 @@ dogs/
 pokemon/
 recordings/
 spectrograms/
+*.npy
+*.h5
